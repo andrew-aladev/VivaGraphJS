@@ -20,12 +20,19 @@ Viva.Graph.View.webglGraphics = function (options) {
     options = Viva.lazyExtend(options, {
         enableBlending : true,
         preserveDrawingBuffer : false,
-        clearColor: false,
-        clearColorValue : {
-            r : 1,
-            g : 1,
-            b : 1,
-            a : 1
+        colors : {
+            clear : false,
+            clear_value : {
+                r : 1,
+                g : 1,
+                b : 1,
+                a : 1
+            },
+            line : 0x333,
+            node : 0x999
+        },
+        sizes : {
+            node : 10
         }
     });
 
@@ -46,12 +53,12 @@ Viva.Graph.View.webglGraphics = function (options) {
         linkProgram = Viva.Graph.View.webglLinkProgram(),
         nodeProgram = Viva.Graph.View.webglNodeProgram(),
 /*jshint unused: false */
-        nodeUIBuilder = function (node) {
-            return Viva.Graph.View.webglSquare(); // Just make a square, using provided gl context (a nodeProgram);
+        nodeUIBuilder = function (node, size, color) {
+            return Viva.Graph.View.webglSquare(size, color); // Just make a square, using provided gl context (a nodeProgram);
         },
 
-        linkUIBuilder = function (link) {
-            return Viva.Graph.View.webglLine(0xb3b3b3ff);
+        linkUIBuilder = function (link, color) {
+            return Viva.Graph.View.webglLine(color);
         },
 /*jshint unused: true */
         updateTransformUniform = function () {
@@ -77,8 +84,18 @@ Viva.Graph.View.webglGraphics = function (options) {
         },
 
         nodeBuilderInternal = function (node) {
-            var nodeId = nodesCount++,
-                ui = nodeUIBuilder(node);
+            var nodeId = nodesCount++;
+            var color  = options.colors.node;
+            var size   = options.sizes.node;
+            if (node.data) {
+                if (node.data.size) {
+                    size = node.data.size;
+                }
+                if (node.data.color) {
+                    color = node.data.color;
+                }
+            }
+            var ui = nodeUIBuilder(node, size, color);
             ui.id = nodeId;
 
             nodeProgram.createNode(ui);
@@ -88,9 +105,13 @@ Viva.Graph.View.webglGraphics = function (options) {
         },
 
         linkBuilderInternal = function (link) {
-            var linkId = linksCount++,
-                ui = linkUIBuilder(link);
-            ui.id = linkId;
+            var linkId = linksCount++;
+            var color  = options.colors.line;
+            if (link.data && link.data.color) {
+                color = link.data.color;
+            }
+            var ui = linkUIBuilder(link, color);
+            ui.id  = linkId;
 
             linkProgram.createLink(ui);
 
@@ -296,8 +317,8 @@ Viva.Graph.View.webglGraphics = function (options) {
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
                 gl.enable(gl.BLEND);
             }
-            if (options.clearColor) {
-                var color = options.clearColorValue;
+            if (options.colors.clear) {
+                var color = options.colors.clear_value;
                 gl.clearColor(color.r, color.g, color.b, color.a);
                 // TODO: not the best way, really. Should come up with something better
                 // what if we need more updates inisde beginRender, like depth buffer?

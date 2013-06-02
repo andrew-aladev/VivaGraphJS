@@ -45,8 +45,8 @@ Viva.Graph.View.renderer = function (graph, settings) {
     // TODO: This class is getting hard to understand. Consider refactoring.
     // TODO: I have a technical debt here: fix scaling/recentring! Currently it's total mess.
     var FRAME_INTERVAL = 30;
-
-    settings = settings || {};
+    
+    settings = Viva.lazyExtend(settings, {});
 
     var layout = settings.layout,
         graphics = settings.graphics,
@@ -194,6 +194,14 @@ Viva.Graph.View.renderer = function (graph, settings) {
 
             renderNode(node);
         },
+        
+        updateNodeUi = function (node) {
+            graphics.releaseNode(node.ui);
+            var nodeUI = graphics.node(node);
+            node.ui = nodeUI;
+
+            renderNode(node);
+        },
 
         removeNodeUi = function (node) {
             if (node.hasOwnProperty('ui')) {
@@ -283,13 +291,7 @@ Viva.Graph.View.renderer = function (graph, settings) {
                     updateCenterRequired = true; // Next time when node is added - center the graph.
                 }
             } else if (change.changeType === 'update') {
-
-                // releaseNodeEvents(node);
-                // removeNodeUi(node);
-
-                // createNodeUi(node);
-                // listenNodeEvents(node);
-                throw 'Update type is not implemented. TODO: Implement me!';
+                updateNodeUi(node);
             }
         },
 
@@ -302,12 +304,6 @@ Viva.Graph.View.renderer = function (graph, settings) {
                 if (settings.renderLinks) { removeLinkUi(link); }
                 layout.removeLink(link);
             } else if (change.changeType === 'update') {
-                // if (settings.renderLinks) { removeLinkUi(link); }
-                // layout.removeLink(link);
-
-                // if (settings.renderLinks) { createLinkUi(link); }
-                // layout.addLink(link);
-                throw 'Update type is not implemented. TODO: Implement me!';
             }
         },
 
