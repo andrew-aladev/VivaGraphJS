@@ -28,8 +28,8 @@ Viva.Graph.View.webglGraphics = function (options) {
                 b : 1,
                 a : 1
             },
-            line : 0x333,
-            node : 0x999
+            line : "#aaaaaa",
+            node : "#aaaaaa"
         },
         sizes : {
             node : 10
