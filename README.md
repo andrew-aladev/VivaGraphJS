@@ -177,3 +177,4 @@ Though I implemented this library from scratch, I went through many existing lib
 * [D3](http://mbostock.github.com/d3/ex/force.html) - one of the best data visualization library in JavaScript world. From [Mike Bostock](https://github.com/mbostock).
 
 My goal is to create highly performant javascript library, which serves in the field of graph drawing. To certain extent I achieved it. But I have no doubt there is much more to improve here.
+
